@@ -11,7 +11,8 @@ JOB_TYPE = (
 
 
 class Job(models.Model):  # table
-    owner = models.ForeignKey(User, related_name='job_owner', on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        User, related_name='job_owner', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)  # column
     # location
     job_type = models.CharField(max_length=15, choices=JOB_TYPE)
@@ -21,7 +22,7 @@ class Job(models.Model):  # table
     salary = models.IntegerField(default=0)
     experience = models.IntegerField(default=1)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='static/photos')
+    image = models.ImageField(upload_to='static/photos', blank=True, null=True)
     slug = models.SlugField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -45,7 +46,7 @@ class Apply(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=100)
     webiste = models.URLField()
-    cv = models.FileField(upload_to='apply/')
+    cv = models.FileField(upload_to='static/photos/apply')
     cover_letter = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now=True)
 

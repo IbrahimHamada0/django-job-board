@@ -1,8 +1,11 @@
 from django.shortcuts import redirect, render
 from django.core.paginator import Paginator
 from django.urls import reverse
+from .filters import *
 from .models import *
 from .forms import *
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -10,17 +13,22 @@ from .forms import *
 def job_list(request):
     job_list = Job.objects.all()
 
-    paginator = Paginator(job_list, 1)  # Show  contacts per page.
+    myfilter = JobFilter(request.GET, queryset=job_list)
+    job_list = myfilter.qs
+
+    paginator = Paginator(job_list, 4)  # Show  contacts per page.
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'jobs': page_obj,
         'allbooks': Job.objects.all().count(),
+        'myfilter': myfilter
     }
-    return render(request, 'jobs_list.html', context)
+    return render(request, 'pages/jobs_list.html', context)
 
 
+@login_required
 def job_detail(request, slug):
     job_detail = Job.objects.get(slug=slug)
 
@@ -35,9 +43,10 @@ def job_detail(request, slug):
         form = ApllyForm()
 
     context = {'job': job_detail, 'form1': form}
-    return render(request, 'job_detail.html', context)
+    return render(request, 'pages/job_detail.html', context)
 
 
+@login_required
 def add_job(request):
     if request.method == 'POST':
         form = JobForm(request.POST, request.FILES)
@@ -49,5 +58,4 @@ def add_job(request):
 
     else:
         form = JobForm()
-
-    return render(request, 'add_job.html', {'form': form})
+    return render(request, 'pages/add_job.html', {'form': form})
